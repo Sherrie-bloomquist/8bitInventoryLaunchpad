@@ -1,50 +1,91 @@
-// properties by which searches can be done
+//-----properties by which searches can be done------//
 var sizes = [ 'small', 'medium', 'large' ];
 var colors = [ 'red', 'orange', 'yellow', 'green', 'mermaid treasure', 'blue', 'purple' ];
 
-////// global array of items in inventory //////
+//----global array of items in inventory----//
 var items = [];
+var matches = [];
 
+//----document ready function------//
 $( document ).ready( function(){
-  var addObject = function( colorIn, nameIn, sizeIn ){
-    console.log( 'in addObject' );
-    // assemble object from new fields
-    var newItem = {
-      color: colorIn,
-      name: nameIn,
-      size: sizeIn
-    }; // end testObject
-    console.log( 'adding:', newItem );
-    ////// TODO: add ajax call to addItem route to add this item to the table
-    // add to items array
-    items.push( newItem );
-  }; // end addObject
 
-  var findObject = function( colorCheck, sizeCheck ){
-    console.log( 'in findObject. Looking for:', colorCheck, sizeCheck );
-    // array of matches
-    var matches = [];
-    for ( var i = 0; i < items.length; i++ ) {
-      if( items[i].color == colorCheck && items[i].size == sizeCheck ){
-        // match, add to array
-        matches.push( items[i] );
-      } // end if
-    } // end for
-    console.log( 'matches:', matches );
-    ////// TODO: display matches
-  }; // end findObject
 
+  //----searchButton on click appends search results to DOM-----//
+    $('#searchButton').on('click', function(){
+      console.log('seach button clicked');
+
+      for ( var i = 0; i < items.length; i++ ) {
+        if( items[i].color == $('#searchColorIn').val() && items[i].size == $('#searchSizeIn').val() ){
+          // match, add to array
+          matches.push( items[i] );
+          $('#appendToDom').append(matches[i]);
+        } // end if
+      } // end for
+    });//end searchButton on click
+
+
+
+
+//---------get response from database/server and push into items array----//
   var getObjects = function(){
     console.log( 'in getObjects');
-    // populate the items array
-    ////// TODO: replace the stuff in this function with getting items from the database ////////
-    ////// hint: make a get call to the getInventory and use it's response data to fill the items array ////////
-  }; // end getObjects
 
-  // get objects when doc is ready
+    $.ajax ({
+      url: '/getInventory',
+      type: 'GET',
+      success: function(response){
+        console.log('response from db', response);
+        items.push(response);
+      }//end success function
+    });//end ajax call
+  };//end getObjects function
+
+
+//-------create the dropdown options in the selector fields-------//
+    var selectorOptions = function(){
+      for (var i = 0; i < sizes.length; i++) {
+        $('#sizeIn').append( '<option>' + sizes[i] + '</option>' );
+      }// end sizeIn for loop
+      for (var i = 0; i < colors.length; i++) {
+        $('#colorIn').append( '<option>' + colors[i] + '</option>' );
+      }// end colorIn for loop
+
+      for (var i = 0; i < sizes.length; i++) {
+        $('#searchSizeIn').append( '<option>' + sizes[i] + '</option>' );
+      }// end searchSizeIn for loop
+      for (var i = 0; i < colors.length; i++) {
+        $('#searchColorIn').append( '<option>' + colors[i] + '</option>' );
+      }// end searchColorIn for loop
+    };
+
+
+//--------addItem button click, sends values entered to server----//
+    $('#addItem').on('click', function(){
+      sendObjects();
+    });//end addItem on click
+
+    var sendObjects = function(){
+      var objectToSend = {
+        size: $('#sizeIn').val(),
+        color: $('#colorIn').val(),
+        name: $('#itemName').val(),
+      }; //end objectToSend
+
+      $.ajax({
+        url: '/addItem',
+        type: 'POST',
+        data: objectToSend,
+        success: function(response){
+          console.log('response from server', response);
+        }//end success function
+      });//end ajax call
+    };//end sendObjects function
+
+
+
+
+//-----run these function on page load-----//
+  selectorOptions();
   getObjects();
-  // the below are tests to show what is returned when running findObject
-  addObject( 'blue', 'blueberry', 'small' )
-  findObject( 'blue', 'small' );
-  findObject( 'blue', 'large' );
+
 }); // end doc ready
