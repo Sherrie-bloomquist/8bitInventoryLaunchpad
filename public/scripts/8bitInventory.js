@@ -10,18 +10,37 @@ var matches = [];
 $( document ).ready( function(){
 
 
-  //----searchButton on click appends search results to DOM-----//
+//----searchButton on click appends search results to DOM-----//
     $('#searchButton').on('click', function(){
       console.log('seach button clicked');
+      searchInventory();
+      displayResults();
+    });//end searchButton on click
 
+//------for loop to search for matches to a search--------//
+    var searchInventory = function(){
       for ( var i = 0; i < items.length; i++ ) {
         if( items[i].color == $('#searchColorIn').val() && items[i].size == $('#searchSizeIn').val() ){
+            console.log('what');
           // match, add to array
           matches.push( items[i] );
-          $('#appendToDom').append(matches[i]);
-        } // end if
+        }// end if
       } // end for
-    });//end searchButton on click
+    };//end searchInventory function
+
+//---------display results on the DOM---------//
+    var displayResults = function(){
+      console.log('in displayResults');
+      for (var i = 0; i < matches.length; i++) {
+        console.log('matches', matches[i]);
+        if (matches[i] === 0){
+          $('#appendToDom').append('<p>' + 'There are no matches to your search' + '</p>');
+        } else {
+          $('#appendToDom').append(matches[i]);
+        }//end else
+      }//end for loop
+
+    };//end displayResults function
 
 
 
@@ -35,7 +54,10 @@ $( document ).ready( function(){
       type: 'GET',
       success: function(response){
         console.log('response from db', response);
-        items.push(response);
+        for (var i = 0; i < response.length; i++) {
+          items.push(response[i]);
+        }
+
       }//end success function
     });//end ajax call
   };//end getObjects function
@@ -59,11 +81,13 @@ $( document ).ready( function(){
     };
 
 
-//--------addItem button click, sends values entered to server----//
+//--------addItem button click----//
     $('#addItem').on('click', function(){
       sendObjects();
     });//end addItem on click
 
+
+//---send values entered to the server------//
     var sendObjects = function(){
       var objectToSend = {
         size: $('#sizeIn').val(),
@@ -84,7 +108,7 @@ $( document ).ready( function(){
 
 
 
-//-----run these function on page load-----//
+//-----run these functions on page load-----//
   selectorOptions();
   getObjects();
 
