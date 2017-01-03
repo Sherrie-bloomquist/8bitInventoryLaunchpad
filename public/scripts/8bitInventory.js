@@ -4,7 +4,7 @@ var colors = [ 'red', 'orange', 'yellow', 'green', 'mermaid treasure', 'blue', '
 
 //----global array of items in inventory----//
 var items = [];
-var matches = [];
+//var matches = [];
 
 //----document ready function------//
 $( document ).ready( function(){
@@ -14,35 +14,26 @@ $( document ).ready( function(){
     $('#searchButton').on('click', function(){
       console.log('seach button clicked');
       searchInventory();
-      displayResults();
     });//end searchButton on click
 
-//------for loop to search for matches to a search--------//
+//------for loop to search for matches to a search and display on the DOM--------//
     var searchInventory = function(){
+      var matches = [];
+      console.log('matches', matches);
       for ( var i = 0; i < items.length; i++ ) {
         if( items[i].color == $('#searchColorIn').val() && items[i].size == $('#searchSizeIn').val() ){
             console.log('what');
           // match, add to array
           matches.push( items[i] );
-        }// end if
+          //appendToDom
+          $('#appendToDom').append('<p>' + items[i].name  + '</p>');
+        }
       } // end for
+      if (matches.length === 0) {
+          alert('There are no matches to your search');
+      }
+
     };//end searchInventory function
-
-//---------display results on the DOM---------//
-    var displayResults = function(){
-      console.log('in displayResults');
-      for (var i = 0; i < matches.length; i++) {
-        console.log('matches', matches[i]);
-        if (matches[i] === 0){
-          $('#appendToDom').append('<p>' + 'There are no matches to your search' + '</p>');
-        } else {
-          $('#appendToDom').append(matches[i]);
-        }//end else
-      }//end for loop
-
-    };//end displayResults function
-
-
 
 
 //---------get response from database/server and push into items array----//
